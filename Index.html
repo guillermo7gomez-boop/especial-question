@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pregunta Especial</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            touch-action: none; /* Evita gestos del sistema que interfieran */
+        }
+
+        /* Ventana que rebota */
+        #floating-box {
+            position: absolute;
+            width: 260px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            text-align: center;
+            border: 5px solid #ff4d6d;
+            user-select: none;
+            z-index: 10;
+            transition: border-color 0.2s;
+        }
+
+        h2 { font-size: 1.3rem; color: #333; margin-bottom: 20px; }
+
+        .buttons { display: flex; justify-content: space-around; }
+
+        button {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        #btn-si { background-color: #ff4d6d; color: white; }
+        #btn-no { background-color: #e0e0e0; color: #666; }
+
+        /* Pantalla Final */
+        #fiesta-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%;
+            background: white;
+            padding: 30px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0,0,0,0.2);
+            z-index: 100;
+            border: 8px solid #ffd700;
+        }
+
+        /* Botón inicial para habilitar música en iOS */
+        #start-overlay {
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: rgba(255,255,255,0.95);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 1000;
+        }
+        #start-btn {
+            padding: 20px 40px;
+            background: #000; color: #fff;
+            border-radius: 50px; font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="start-overlay">
+        <button id="start-btn" onclick="iniciarTodo()">Pulsa para empezar ❤️</button>
+    </div>
+
+    <div id="floating-box">
+        <h2>¿Wapo Quieres ir a Comer...nos? 🌹</h2>
+        <div class="buttons">
+            <button id="btn-si" onclick="aceptar()">¡SÍ!</button>
+            <button id="btn-no" ontouchstart="acelerar()" onmouseover="acelerar()">No</button>
+        </div>
+    </div>
+
+    <div id="fiesta-modal">
+        <h1>¡Sabía que aceptarías Wapo! ❤️</h1>
+        <p style="font-size: 3rem;">🎉🥳🔥</p>
+    </div>
+
+    <audio id="musica" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+        </audio>
+
+    <script>
+        const box = document.getElementById('floating-box');
+        const modal = document.getElementById('fiesta-modal');
+        const overlay = document.getElementById('start-overlay');
+        const musica = document.getElementById('musica');
+        
+        let posX = 50;
+        let posY = 50;
+        let speedX = 2.5;
+        let speedY = 2.5;
+        let acceleration = 1;
+        let isMoving = false;
+
+        function iniciarTodo() {
+            overlay.style.display = 'none';
+            isMoving = true;
+            musica.play().catch(e => console.log("Error de audio:", e));
+            move();
+        }
+
+        function getRandomColor() {
+            const colors = ['#00ff00', '#ff00ff', '#00ffff', '#ffff00', '#ff4d6d'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function move() {
+            if (!isMoving) return;
+
+            posX += speedX * acceleration;
+            posY += speedY * acceleration;
+
+            // Rebote en bordes (ajustado para mobile)
+            if (posX + box.clientWidth >= window.innerWidth || posX <= 0) {
+                speedX *= -1;
+                box.style.borderColor = getRandomColor();
+            }
+            if (posY + box.clientHeight >= window.innerHeight || posY <= 0) {
+                speedY *= -1;
+                box.style.borderColor = getRandomColor();
+            }
+
+            box.style.left = posX + 'px';
+            box.style.top = posY + 'px';
+
+            requestAnimationFrame(move);
+        }
+
+        function acelerar() {
+            acceleration += 0.7; // Se vuelve loco al intentar tocar "No"
+        }
+
+        function aceptar() {
+            isMoving = false;
+            box.style.display = 'none';
+            modal.style.display = 'block';
+            document.body.style.backgroundColor = "#ffeff2";
+        }
+
+        // Ajuste de tamaño
+        window.addEventListener('resize', () => {
+            posX = 10; posY = 10;
+        });
+    </script>
+</body>
+</html>
